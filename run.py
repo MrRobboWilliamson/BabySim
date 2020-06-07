@@ -5,8 +5,10 @@ from event_queue.event_queue import EventQueue
 from components.client import Client
 from components.server import Server
 from components.queue import SimpleQueue
-from logging.logger import Logger
+from event_logger.logger import Logger
 from network.network import Network
+
+import numpy as np
 
 def run_simulation(period, time_units, lam):
     # lambda corresponds to the distribution of the inter-arrival time
@@ -22,16 +24,12 @@ def run_simulation(period, time_units, lam):
     # initiate time
     t = 0
 
-    # intiate the event queue
-    events = list()
-    event_details = dict()
-
     # initiate components and put them in a dictionary
     eq = EventQueue(time_units)
     q1 = SimpleQueue('q1')
     s1 = Server(mu1, 's1', q1, eq)
     q2 = SimpleQueue('q2')
-    s2 = Server(mu2), 's2', q2, eq)
+    s2 = Server(mu2, 's2', q2, eq)
     nodes = dict()
     nodes['s1'] = s1
     nodes['s2'] = s2
@@ -55,9 +53,6 @@ def run_simulation(period, time_units, lam):
     injection_point = 's1'
     details = dict(client=c0, component=injection_point, action='inject')
     eq.put_event(t, details)
-
-    # this variable will take all of the event records
-    all_records = list()
 
     # do while t is less than T
     iteration = 0
@@ -116,4 +111,4 @@ def run_simulation(period, time_units, lam):
 
 
 if __name__ == "__main__":
-    run_simulation()
+    run_simulation(period=20000, time_units='S', lam=2.5)
