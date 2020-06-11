@@ -30,6 +30,16 @@ def plot_qocc(df, title, order):
                  data=queues, drawstyle='steps-post', alpha=0.5)
     plt.title(title)
 
+def get_cdf(x):
+    # return a cdf from a vector
+    n = len(x)
+    x = np.sort(x)
+    pos = np.array(range(1, n+1))
+    prb = pos / n
+    
+    # return values, and probabilities
+    return x, prb
+
 class ConsoleBar:
     def __init__(self, num_ticks):
         # check that end - start is greater than one and that they are both integers
