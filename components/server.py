@@ -1,7 +1,7 @@
 '''
 This is the server
 '''
-from numpy import np
+import numpy as np
 
 class Server:
     '''
@@ -10,17 +10,29 @@ class Server:
     it will take a queue to hold clients when not available
     it will be connected to another server or system exit
     '''
-    def __init__(self, mu, component_ID, queue, event_queue):
+    def __init__(self, mu, component_ID, queue, event_queue, samples=None):
         self.mu = mu
         self.cID = component_ID
         self.is_available = True
         self.client = None
         self.queue = queue
         self.event_queue = event_queue
-        
-    def process_time(self):
+        self.samples = samples
+
+        if samples is not None:
+            self.process_time = self.take_sample
+        else:
+            self.process_time = self.exponential
+
+    # for using with a parameter mu        
+    def exponential(self):
         return np.random.exponential(self.mu)
-    
+
+    # for using a random sample
+    def take_sample(self):
+        return np.random.choice(self.samples)
+
+    # for a given data set    
     def record(self, next_action):
         '''
         sends and event record to the event queue
@@ -57,7 +69,7 @@ class Server:
         self.is_available = True
         
         # check if there is another client in the queue
-        if self.queue.check():
+        if self.queue.is_occupied:
             next_client = self.queue.get(t)
             self.put(next_client, t)
 

@@ -9,6 +9,22 @@ from event_logger.logger import Logger
 from network.network import Network
 
 import numpy as np
+import pandas as pd
+
+### get the data
+data = pd.read_csv(r'..\data.csv')
+print(data.head())
+
+#### define the system
+# we will have a distributor node that allocates between the servers
+# allocation will depend on the size of the queue
+# otherwise random
+
+UNITS = 'M'
+# INTER = 
+
+# def inject(sampl)
+
 
 def run_simulation(period, time_units, lam):
     # lambda corresponds to the distribution of the inter-arrival time
@@ -111,4 +127,5 @@ def run_simulation(period, time_units, lam):
 
 
 if __name__ == "__main__":
-    run_simulation(period=20000, time_units='S', lam=2.5)
+    logs = run_simulation(period=20000, time_units='S', lam=2.5)
+    print(logs.head())

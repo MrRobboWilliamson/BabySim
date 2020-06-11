@@ -9,6 +9,7 @@ class SimpleQueue:
         self.container = list()
         self.cID = component_ID
         self.is_occupied = False
+        self.length = 0
         
     def put(self, client, t):
         '''
@@ -17,6 +18,7 @@ class SimpleQueue:
         client.record(t, self.cID, 'put')
         self.container.append(client)
         self.is_occupied = True
+        self.length += 1
         
     def get(self, t):
         '''
@@ -32,7 +34,5 @@ class SimpleQueue:
             self.is_occupied = False
             
         # return the client
+        self.length =- 1
         return client
-    
-    def check(self):
-        return self.is_occupied
