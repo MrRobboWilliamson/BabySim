@@ -27,7 +27,7 @@ class Distributor:
 
         # set the otherwise behaviour
         if otherwise == 'random':
-            self.otherise = self.get_random
+            self.otherwise = self.get_random
         else:
             raise Exception('Distributor Error: Otherwise option does not exist')
         

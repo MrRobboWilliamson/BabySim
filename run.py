@@ -5,68 +5,40 @@ from event_queue.event_queue import EventQueue
 from components.client import Client
 from components.server import Server
 from components.queue import SimpleQueue
+from components.distributor import Distributor
 from event_logger.logger import Logger
 from network.network import Network
+from utils.tools import ConsoleBar
 
 import numpy as np
 import pandas as pd
 
-### get the data
+### get the data and define the global parameters
 data = pd.read_csv(r'..\data.csv')
-print(data.head())
-
-#### define the system
-# we will have a distributor node that allocates between the servers
-# allocation will depend on the size of the queue
-# otherwise random
-
+INJECT_SAMPLES = data['inter_arrival_time'].values
+SERVICE_SAMPLES = data['service_time'].values
+PERIOD = 3000
+BURN_IN = 1000
 UNITS = 'M'
-# INTER = 
 
-# def inject(sampl)
-
-
-def run_simulation(period, time_units, lam):
+def run_simulation(system):
     # lambda corresponds to the distribution of the inter-arrival time
     # mu1 and mu2 are the time to service distributions for server1 and server2
     # assume time is in seconds and we are plotting an 8 hour shift of operations
-    T = period
+    T = PERIOD
 
-    # parameters
-    lam = lam
-    mu1 = 1
-    mu2 = 2
-
-    # initiate time
+    # initiate time and client index
     t = 0
-
-    # initiate components and put them in a dictionary
-    eq = EventQueue(time_units)
-    q1 = SimpleQueue('q1')
-    s1 = Server(mu1, 's1', q1, eq)
-    q2 = SimpleQueue('q2')
-    s2 = Server(mu2, 's2', q2, eq)
-    nodes = dict()
-    nodes['s1'] = s1
-    nodes['s2'] = s2
-
-    # the edges define the connetions in the network
-    # server 1 is connected to server 2 and after server 2
-    # the client is done "end"
-    edges = [('s1', 's2'), ('s2', 'end')]
-
-    # put into network - this will help us call the next node
-    system = Network(edges)
+    cindex = 0
 
     # schedule the first event by instantiating a client and 
     # adding the first event to the event queue
     # schedule the next injection too
-    cindex = 0
-    t1 = np.random.exponential(lam)
+    t1 = np.random.choice(INJECT_SAMPLES)
     t += t1
     event_log = Logger()
     c0 = Client(t, cindex, event_log)
-    injection_point = 's1'
+    injection_point = system.injection_point
     details = dict(client=c0, component=injection_point, action='inject')
     eq.put_event(t, details)
 
@@ -88,11 +60,11 @@ def run_simulation(period, time_units, lam):
                 # put client and schedule get
                 # the component will return the new time and the next event
                 # next_event will be none if the client is placed in a queue
-                nodes[comp_id].put(clnt, t)
+                system.nodes[comp_id].put(clnt, t)
                 cindex += 1
 
                 # schedule the next injection
-                tn = t + np.random.exponential(lam)
+                tn = t + np.random.choice(INJECT_SAMPLES)
                 cn = Client(tn, cindex, event_log)
                 details = dict(client=cn, component=injection_point, action='inject')
                 eq.put_event(tn, details)
@@ -127,5 +99,48 @@ def run_simulation(period, time_units, lam):
 
 
 if __name__ == "__main__":
-    logs = run_simulation(period=20000, time_units='S', lam=2.5)
-    print(logs.head())
+    
+    ### main body of the simulation ###
+    # for this task we can create a range of scenarios where we have 1 to 10 service desks
+    N = 10
+    num_servers = range(1, N+1)
+    bar = ConsoleBar(N)
+    results = list()
+    print("Running simulation")
+    for n in num_servers:
+        # create an event queue
+        eq = EventQueue(UNITS)
+
+        # create n servers and n queues (one per server)
+        servers = [Server(component_ID=f"s{idx}", queue=SimpleQueue(f"q{idx}"), event_queue=eq, samples=SERVICE_SAMPLES) for idx in range(n)]
+
+        # create the distributor that distributes to the smallest queue and random otherwise
+        d0 = Distributor(servers, "smallq", "random")
+
+        # define the network as nodes and edges
+        # nodes
+        nodes = {srvr.cID:srvr for srvr in servers}
+        nodes['d0'] = d0
+
+        # edges all nodes connect to the distributor, but this won't need to be defined
+        # as the distributor will allocate to the other nodes
+        # this is a simple system, so each service connects to an endpoint
+        edges = [(srvr.cID, 'end') for srvr in servers]
+        system = Network(edges, nodes, injection_point='d0')
+
+        # run the simulation and get the logs
+        scenario_log = run_simulation(system=system)
+
+        # label the scenario
+        scenario_log['scenario'] = n
+        results.append(scenario_log)
+        bar.tick()
+
+    print("Simulation finished")
+
+    # concatenate the results and save to file
+    results = pd.concat(results).reset_index(drop=True)
+    results.to_csv("sim_results.csv", index=False)
+
+
+

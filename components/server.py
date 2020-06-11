@@ -10,7 +10,7 @@ class Server:
     it will take a queue to hold clients when not available
     it will be connected to another server or system exit
     '''
-    def __init__(self, mu, component_ID, queue, event_queue, samples=None):
+    def __init__(self, component_ID, queue, event_queue, mu=None, samples=None):
         self.mu = mu
         self.cID = component_ID
         self.is_available = True
