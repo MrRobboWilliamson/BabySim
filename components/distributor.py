@@ -6,6 +6,7 @@ import numpy as np
 class Distributor:
     """
     conditions:
+    - is available - first look for available nodes, then
     - smallest - looks for the node with the smallest queue
     - potential for others
 
@@ -32,11 +33,18 @@ class Distributor:
             raise Exception('Distributor Error: Otherwise option does not exist')
         
     def get_smallest(self):
-        # for condition smallest, return a list of components with length == min(lengths)
-        lengths = [node.queue.length for node in self.connections]
-        minval = min(lengths)
-        smallest = [idx for idx, l in enumerate(lengths) if l==minval]
-        return smallest
+        # first check if any of the connections are available
+        available = [idx for idx, node in enumerate(self.connections) if node.is_available]
+
+        # if none are available look for the smallest queue
+        if len(available) > 0:
+            return available
+        else:
+            # for condition smallest, return a list of components with length == min(lengths)
+            lengths = [node.queue.length for node in self.connections]
+            minval = min(lengths)
+            smallest = [idx for idx, l in enumerate(lengths) if l==minval]
+            return smallest
 
     def get_random(self, short_list):
         # for if condiction or otherwise are "random" return a uniform random selection of

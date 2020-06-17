@@ -6,7 +6,7 @@ import numpy as np
 class Server:
     '''
     this is a machine class that is initiated with mu and 
-    will service clients with an exponential distribution (mu)
+    will service clients with an exponential distribution (mu) or samples and sample choose from the samples
     it will take a queue to hold clients when not available
     it will be connected to another server or system exit
     '''
@@ -40,15 +40,18 @@ class Server:
         return dict(client=self.client, component=self.cID, action=next_action)
     
     def put(self, client, t):
-        '''
-        if not busy, set to busy
-        return the processing time
-        communicate with the client
-        store the client
-        
-        if busy put in the queue
-        '''
+        # put the client straight in the queue
+        self.queue.put(client, t)
+
+        # process the head of the queue
+        self.process_head(t)
+
+    def process_head(self, t):
         if self.is_available:
+            # if available get from the queue
+            client = self.queue.get(t)
+
+            # record service put
             client.record(t, self.cID, 'put')
             self.client = client
             self.is_available = False
@@ -56,12 +59,8 @@ class Server:
             # schedule the get
             service_time = self.process_time()
             self.event_queue.put_event(t + service_time,
-                                 self.record('get'))        
-        else:
-            # add this client to the queue
-            self.queue.put(client, t)
-            return None
-    
+                                 self.record('get'))
+
     def get(self, t):
         # return the client and record the event        
         client = self.client
@@ -70,8 +69,7 @@ class Server:
         
         # check if there is another client in the queue
         if self.queue.is_occupied:
-            next_client = self.queue.get(t)
-            self.put(next_client, t)
+            self.process_head(t)
 
         # finally return the client
         return client

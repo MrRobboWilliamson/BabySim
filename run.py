@@ -18,7 +18,6 @@ data = pd.read_csv(r'..\data.csv')
 INJECT_SAMPLES = data['inter_arrival_time'].values
 SERVICE_SAMPLES = data['service_time'].values
 PERIOD = 3000
-BURN_IN = 1000
 UNITS = 'M'
 
 def run_simulation(system):
