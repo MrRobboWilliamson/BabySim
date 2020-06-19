@@ -71,11 +71,11 @@ def run_simulation(system):
             # action the event and schedule the another event
             elif action == 'put':
                 # put client - component will schedule get
-                nodes[comp_id].put(clnt, t)
+                system.nodes[comp_id].put(clnt, t)
 
             elif action == 'get':
                 # get client and schedule put in the next component
-                client = nodes[comp_id].get(t)
+                client = system.nodes[comp_id].get(t)
 
                 # get the next component in the network
                 next_comp = system.get_next(comp_id)
