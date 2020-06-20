@@ -27,9 +27,9 @@ class SimpleQueue:
         
         # check the length of the queue, if it's zero then 
         # flag is_occupied = False
+        self.length =- 1
         if len(self.container) == 0:
             self.is_occupied = False
             
         # return the client
-        self.length =- 1
         return client
