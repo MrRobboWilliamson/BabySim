@@ -41,6 +41,7 @@ class Distributor:
             return available
         else:
             # for condition smallest, return a list of components with length == min(lengths)
+            # print(self.connections[0].queue.length)
             lengths = [node.queue.length for node in self.connections]
             minval = min(lengths)
             smallest = [idx for idx, l in enumerate(lengths) if l==minval]

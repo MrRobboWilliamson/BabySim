@@ -68,7 +68,8 @@ def run_simulation(system):
                 details = dict(client=cn, component=injection_point, action='inject')
                 eq.put_event(tn, details)
 
-            # action the event and schedule the another event
+            # action the event and schedule another event
+            # don't think this actually happens
             elif action == 'put':
                 # put client - component will schedule get
                 system.nodes[comp_id].put(clnt, t)
@@ -121,8 +122,8 @@ if __name__ == "__main__":
         nodes = {srvr.cID:srvr for srvr in servers}
         nodes['d0'] = d0
 
-        # edges all nodes connect to the distributor, but this won't need to be defined
-        # as the distributor will allocate to the other nodes
+        # all nodes connect to the distributor, but this won't need to be defined
+        # as the distributor stores it's connections
         # this is a simple system, so each service connects to an endpoint
         edges = [(srvr.cID, 'end') for srvr in servers]
         system = Network(edges, nodes, injection_point='d0')

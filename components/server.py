@@ -21,8 +21,10 @@ class Server:
 
         if samples is not None:
             self.process_time = self.take_sample
-        else:
+        elif mu is not None:
             self.process_time = self.exponential
+        else:
+            raise Exception("No service time parameters provided")
 
     # for using with a parameter mu        
     def exponential(self):
@@ -64,6 +66,7 @@ class Server:
     def get(self, t):
         # return the client and record the event        
         client = self.client
+        self.client = None
         client.record(t, self.cID, 'get')
         self.is_available = True
         
