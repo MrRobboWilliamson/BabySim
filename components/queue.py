@@ -1,9 +1,6 @@
-
-
 class SimpleQueue:
     '''
-    this is a queue first in last out style doesn't pay attention to
-    anything and does not have a length limit
+    this is a first in first out queue with no length limit
     '''
     def __init__(self, component_ID):
         self.container = list()

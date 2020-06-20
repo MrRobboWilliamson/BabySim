@@ -53,7 +53,7 @@ class ConsoleBar:
         self.ticker = 0
 
         # start the ticker
-        print('\r   {:>3.0f}%[{: <101}]'.format(0, '='*0+'>'), end='\r')
+        # print('\r   {:>3.0f}%[{: <101}]'.format(0, '='*0+'>'), end='\r')
 
     def tick(self, step=1):
         print_end = '\r'
@@ -66,4 +66,4 @@ class ConsoleBar:
             print_end = '\n'
 
         progress = int((self.ticker/self.num_ticks)*100)
-        print('\r   {:>3.0f}%[{: <101}]'.format(progress, '='*progress+'>'), end=print_end)
+        print('   {:>3.0f}%[{: <101}]'.format(progress, '='*progress+'>'), end=print_end)

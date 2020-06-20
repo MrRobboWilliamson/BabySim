@@ -36,7 +36,7 @@ def run_simulation(system):
     t1 = np.random.choice(INJECT_SAMPLES)
     t += t1
     event_log = Logger()
-    c0 = Client(t, cindex, event_log)
+    c0 = Client(cindex, event_log)
     injection_point = system.injection_point
     details = dict(client=c0, component=injection_point, action='inject')
     eq.put_event(t, details)
@@ -64,7 +64,7 @@ def run_simulation(system):
 
                 # schedule the next injection
                 tn = t + np.random.choice(INJECT_SAMPLES)
-                cn = Client(tn, cindex, event_log)
+                cn = Client(cindex, event_log)
                 details = dict(client=cn, component=injection_point, action='inject')
                 eq.put_event(tn, details)
 

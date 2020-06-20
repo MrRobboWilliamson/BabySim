@@ -8,10 +8,8 @@ class Client:
     this is a client class that is initiated with an
     arrival time
     '''
-    def __init__(self, t, ID, logger):
-        self.arrive = t
+    def __init__(self, ID, logger):
         self.ID = ID
-        self.depart = -1
         self.logger = logger
         
     def record(self, t, comp_id, event):
