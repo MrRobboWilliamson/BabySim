@@ -20,37 +20,33 @@ SERVICE_SAMPLES = data['service_time'].values
 PERIOD = 3000
 UNITS = 'M'
 
-def run_simulation(system, event_queue):
-    # schedule the first event and execute the event loop
-    # set simulation run time
+def run_simulation(system):
+    # lambda corresponds to the distribution of the inter-arrival time
+    # mu1 and mu2 are the time to service distributions for server1 and server2
+    # assume time is in seconds and we are plotting an 8 hour shift of operations
     T = PERIOD
 
-    # initiate time at 0 minutes and first client index to 0
+    # initiate time and client index
     t = 0
     cindex = 0
 
-    # create the event logger to record client actions
-    event_log = Logger()
-    
-    # create first client
-    c0 = Client(cindex, event_log)
-
-    # set the injection point
-    injection_point = system.injection_point
-
     # schedule the first event by instantiating a client and 
     # adding the first event to the event queue
+    # schedule the next injection too
     t1 = np.random.choice(INJECT_SAMPLES)
-    t += t1    
+    t += t1
+    event_log = Logger()
+    c0 = Client(cindex, event_log)
+    injection_point = system.injection_point
     details = dict(client=c0, component=injection_point, action='inject')
-    event_queue.put_event(t, details)
+    eq.put_event(t, details)
 
     # do while t is less than T
     iteration = 0
     while t < T:
         try:
             # get the next event on the list
-            t, details = event_queue.get_event()
+            t, details = eq.get_event()
 
             # get the event details
             clnt = details['client']
@@ -70,7 +66,7 @@ def run_simulation(system, event_queue):
                 tn = t + np.random.choice(INJECT_SAMPLES)
                 cn = Client(cindex, event_log)
                 details = dict(client=cn, component=injection_point, action='inject')
-                event_queue.put_event(tn, details)
+                eq.put_event(tn, details)
 
             # action the event and schedule another event
             # don't think this actually happens
@@ -91,7 +87,7 @@ def run_simulation(system, event_queue):
                     del(client)
                 else:
                     details = dict(client=client, component=next_comp, action='put')
-                    event_queue.put_event(t, details)
+                    eq.put_event(t, details)
         except Exception as ex:
             print(f"Error on iteration {iteration}:", ex)
             print(event_log.get_logs().tail())
@@ -133,7 +129,7 @@ if __name__ == "__main__":
         system = Network(edges, nodes, injection_point='d0')
 
         # run the simulation and get the logs
-        scenario_log = run_simulation(system=system, event_queue=eq)
+        scenario_log = run_simulation(system=system)
 
         # label the scenario
         scenario_log['scenario'] = n
