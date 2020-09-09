@@ -58,7 +58,7 @@ Allocates clients to components when there is a choice
 The distributor is instantiated with a list of servers it is connected to and interacts with the event loop via the put method. This method takes a client and event time. It randomly distributes customers to service desks when more than one is available. If not, the desk with the smallest queue will be allocated as per the customer behaviour findings. If more than one queue has the minimum length, a random choice will be made between those.
 
 ### Server: server.py
-Service desk queue representation
+Service desk representation
 
 Represents a system component that processes clients. On creation a server is allocated a service time distribution, a queue and a pointer to the event queue. The service time distribution can be provided as an exponential distribution parameter μ or a sample of service times. Service times are chosen when a client goes into service, either uniformly at random from the samples provided or sampled from the exponential distribution.
 
