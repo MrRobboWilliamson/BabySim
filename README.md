@@ -1,5 +1,5 @@
 # BabySim
-BabySim is a simple simulation tool developed to undertake discrete event simulation as part of an assignemt for the Statistical Methods for Data Science course under the Master of Data Science program at the University of Queensland, Australia.
+BabySim is a simple simulation tool developed to undertake discrete event simulation as part of an assignment for the Statistical Methods for Data Science course under the Master of Data Science program at the University of Queensland, Australia.
 
 Please see RobWilliamson_A4, from Question 2 onwards for use case.
 
